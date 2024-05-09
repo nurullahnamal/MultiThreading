@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MultiThreading.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -41,21 +42,39 @@ namespace MultiThreading
 
         private void btnListMailTasks_Click(object sender, EventArgs e)
         {
-            var mailtask = new MailTask()
+            var smtpMailTaks= new MailTask(MailProviderType.Smtp)
+            {
+                Second = 10
+            };
+            var googleMailTaks = new MailTask(MailProviderType.GoogleMail)
             {
                 Second = 60
             };
 
             mailTaskBindingSource.Clear();
-            mailTaskBindingSource.Add(mailtask);
+            mailTaskBindingSource.Add(smtpMailTaks);
+            mailTaskBindingSource.Add(googleMailTaks);
+
         }
 
         private void mailTaskBindingSource_CurrentChanged(object sender, EventArgs e)
         {
 
         }
+        private void mailTaskBindingSource_CurrentItemChanged_1(object sender, EventArgs e)
+        {
+            var mailTask = mailTaskBindingSource.Current as MailTask;
 
-     
+            if (mailTask == null)
+                return;
+
+            btnStartTask.Enabled = !mailTask.IsStarted;
+
+            btnStopTask.Enabled = mailTask.IsStarted;
+            btnRunTask.Enabled = mailTask.IsStarted && !mailTask.IsRunning;
+        }
+
+
 
         private void btnStartTask_Click(object sender, EventArgs e)
         {
@@ -73,21 +92,55 @@ namespace MultiThreading
         private async void btnRunTask_Click(object sender, EventArgs e)
         {
             var mailTask = mailTaskBindingSource.Current as MailTask;
-            await mailTask.Run();
+
+            var numberOfMails = (int)numericMailCount.Value;
+
+
+
+           
+            await mailTask.Run(50);
 
         }
 
-        private void mailTaskBindingSource_CurrentItemChanged_1(object sender, EventArgs e)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        private void lbLogs_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var mailTask = mailTaskBindingSource.Current as MailTask;
 
-            if (mailTask == null)
-                return;
+        }
 
-            btnStartTask.Enabled = !mailTask.IsStarted;
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
 
-            btnStopTask.Enabled = mailTask.IsStarted;
-            btnRunTask.Enabled = mailTask.IsStarted && !mailTask.IsRunning;
         }
     }
 }

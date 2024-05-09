@@ -14,6 +14,12 @@ namespace MultiThreading
             return GetMails(number, MailProviderType.Smtp); 
         }
 
+
+        public static IEnumerable<MailObject> GetGoogleMails(int number)
+        {
+            return GetMails(number, MailProviderType.GoogleMail);
+        }
+
         public static IEnumerable<MailObject> GetMails(int number,MailProviderType? mailProviderType =null)
         {
             Bogus.Faker<MailObject> faker
