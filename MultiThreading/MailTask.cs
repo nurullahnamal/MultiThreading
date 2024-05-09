@@ -11,7 +11,7 @@ namespace MultiThreading
     {
         private bool isRunning;
         private bool isStarted;
-        private DateTime? nExtRunning;
+        private DateTime? nextRunning;
 
         public Guid TaskId { get; set; } = Guid.NewGuid();
         public bool IsRunning
@@ -34,13 +34,13 @@ namespace MultiThreading
             }
         }
         public int Second { get; set; } = 60;
-        public DateTime? NExtRunning
+        public DateTime? NextRunning
         {
-            get => nExtRunning;
+            get => nextRunning;
             set
             {
-                nExtRunning = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(NExtRunning)));
+                nextRunning = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(NextRunning)));
             }
         }
 
@@ -49,12 +49,20 @@ namespace MultiThreading
 
         public async Task Run()
         {
+
+            var manager = new MailManager();
+
             while (IsStarted)
             {
-                IsStarted = true;
+                isRunning = true;
+
+                var smtpMails = FakeDataCreator.GetMails(100);
+                manager.AddMails(smtpMails);
+                await manager.SendAllMails();
+
                 IsRunning = false;
 
-                NExtRunning = DateTime.Now.AddSeconds(Second);
+                NextRunning = DateTime.Now.AddSeconds(Second);
 
                 await Task.Delay(Second * 1000);
             }
@@ -63,13 +71,13 @@ namespace MultiThreading
         public void Start()
         {
             IsStarted = true;
-            NExtRunning = DateTime.Now.AddSeconds(Second);
+            NextRunning = DateTime.Now.AddSeconds(Second);
         }
 
         public void Stop()
         {
             IsStarted = false;
-            NExtRunning = null;
+            NextRunning = null;
         }
     }
 }

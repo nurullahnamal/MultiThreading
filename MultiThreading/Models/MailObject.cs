@@ -15,7 +15,7 @@ namespace MultiThreading.Models
 
     public enum MailProviderType
     {
-        None=0,
-        Smtp=1
+        Smtp=1,
+        GoogleMail=2
     }
 }

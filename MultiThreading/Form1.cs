@@ -25,25 +25,17 @@ namespace MultiThreading
         }
 
 
-
-
-
-
-
-
-
-
         private void Addlog(string logMessage)
         {
-            if (listBox1.InvokeRequired)
+            if (lbLogs.InvokeRequired)
             {
-                listBox1.Invoke(new Action(() => Addlog(logMessage)));
+                lbLogs.Invoke(new Action(() => Addlog(logMessage)));
                 return;
             }
 
             logMessage = $"[{DateTime.Now:dd.MM.yyy HH.mm.ss:fff}] - {logMessage}";
-            listBox1.Items.Add(logMessage);
-            listBox1.SelectedIndex = listBox1.Items.Count - 1;
+            lbLogs.Items.Add(logMessage);
+            lbLogs.SelectedIndex = lbLogs.Items.Count - 1;
 
         }
 
@@ -53,6 +45,7 @@ namespace MultiThreading
             {
                 Second = 60
             };
+
             mailTaskBindingSource.Clear();
             mailTaskBindingSource.Add(mailtask);
         }
@@ -62,18 +55,7 @@ namespace MultiThreading
 
         }
 
-        private void mailTaskBindingSource_CurrentItemChanged(object sender, EventArgs e)
-        {
-            var mailTask = mailTaskBindingSource.Current as MailTask;
-
-            if (mailTask == null) return;
-
-            btnStartTask.Enabled = !mailTask.IsStarted;
-
-            btnStopTask.Enabled = mailTask.IsStarted;
-            btnRunTask.Enabled = mailTask.IsRunning && !mailTask.IsRunning;
-
-        }
+     
 
         private void btnStartTask_Click(object sender, EventArgs e)
         {
@@ -86,6 +68,26 @@ namespace MultiThreading
             var mailTask = mailTaskBindingSource.Current as MailTask;
             mailTask.Stop();
 
+        }
+
+        private async void btnRunTask_Click(object sender, EventArgs e)
+        {
+            var mailTask = mailTaskBindingSource.Current as MailTask;
+            await mailTask.Run();
+
+        }
+
+        private void mailTaskBindingSource_CurrentItemChanged_1(object sender, EventArgs e)
+        {
+            var mailTask = mailTaskBindingSource.Current as MailTask;
+
+            if (mailTask == null)
+                return;
+
+            btnStartTask.Enabled = !mailTask.IsStarted;
+
+            btnStopTask.Enabled = mailTask.IsStarted;
+            btnRunTask.Enabled = mailTask.IsStarted && !mailTask.IsRunning;
         }
     }
 }
